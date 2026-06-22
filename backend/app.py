@@ -11,6 +11,7 @@ from routes.auth import auth_bp
 from routes.tickets import tickets_bp
 from routes.users import users_bp
 from routes.dashboard import dashboard_bp
+from routes.reportes import reportes_bp
 
 
 def crear_admin_si_no_existe():
@@ -44,6 +45,7 @@ def create_app():
     app.register_blueprint(tickets_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(reportes_bp)
 
     frontend_dist = None
     if getattr(sys, "frozen", False):

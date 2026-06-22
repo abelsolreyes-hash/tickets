@@ -91,6 +91,20 @@ body {
   padding: 1.5rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+}
+
+.app-content::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("../img/logo-odapas.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 300px auto;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Auth screens */

@@ -26,8 +26,20 @@ const Dashboard = {
         })
         .join("");
 
+      const hoy = new Date().toISOString().split("T")[0];
+
       container.innerHTML = `
         <h3 style="margin-bottom:1rem">Dashboard</h3>
+
+        <div class="card" style="margin-bottom:1rem;padding:1rem">
+          <div style="display:flex;align-items:end;gap:1rem;flex-wrap:wrap">
+            <div class="form-group" style="margin:0">
+              <label>Fecha del reporte</label>
+              <input type="date" id="reporte-fecha" value="${hoy}">
+            </div>
+            <button class="btn btn-primary" id="btn-descargar-reporte">Descargar PDF</button>
+          </div>
+        </div>
 
         <div class="dashboard-grid">
           <div class="stat-card"><div class="stat-value">${resumen.total_tickets}</div><div class="stat-label">Total Tickets</div></div>
@@ -53,6 +65,29 @@ const Dashboard = {
           </div>
         </div>
       `;
+
+      document.getElementById("btn-descargar-reporte").addEventListener("click", () => {
+        const fecha = document.getElementById("reporte-fecha").value;
+        if (!fecha) return alert("Selecciona una fecha");
+        const token = getToken();
+        const url = `${getApiBase()}/reportes/actividad-diaria?fecha=${fecha}`;
+        fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+          .then(async (res) => {
+            if (!res.ok) {
+              const err = await res.json().catch(() => null);
+              throw new Error(err?.error || `Error ${res.status}`);
+            }
+            return res.blob();
+          })
+          .then((blob) => {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `reporte_diario_${fecha}.pdf`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+          })
+          .catch((err) => alert("Error: " + err.message));
+      });
     } catch (err) {
       container.innerHTML = `<p style="color:var(--danger)">Error: ${err.message}</p>`;
     }
