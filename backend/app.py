@@ -23,10 +23,10 @@ def crear_admin_si_no_existe():
             rol="admin",
             area="Informatica",
         )
-        admin.set_password("admin123")
+        admin.set_password("odapas2026")
         db.session.add(admin)
         db.session.commit()
-        print("Admin creado: admin@sistema.local / admin123")
+        print("Admin creado: admin@sistema.local / odapas2026")
 
 
 def create_app():
