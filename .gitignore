@@ -1,0 +1,12 @@
+node_modules/
+__pycache__/
+*.pyc
+dist/
+dist-electron/
+dist-electron-v2/
+*.db
+flask_err.txt
+flask_out.txt
+build/
+*.spec
+.DS_Store

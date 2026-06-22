@@ -1,0 +1,42 @@
+{
+  "name": "sistema-tickets",
+  "version": "1.0.0",
+  "description": "Sistema de Tickets para Informatica",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "dist": "electron-builder --win portable",
+    "pack": "electron-builder --win portable --x64"
+  },
+  "build": {
+    "appId": "com.sistema-tickets.app",
+    "productName": "Sistema Tickets",
+    "directories": {
+      "output": "../dist-electron-v2"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist/tickets-server.exe",
+        "to": "backend/tickets-server.exe"
+      }
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "src/icon.png"
+    },
+    "portable": {
+      "artifactName": "SistemaTickets-Portable-${version}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.4.0",
+    "electron-builder": "^25.1.8"
+  }
+}
