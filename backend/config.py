@@ -17,7 +17,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "cambiar-en-produccion-1234567890abc")
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL", f"sqlite:///{os.path.join(DATA_DIR, 'tickets.db')}"
-    )
+    ).replace("postgres://", "postgresql://", 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_EXPIRATION_HOURS = 24
 
