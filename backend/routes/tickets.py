@@ -12,18 +12,15 @@ def listar_tickets():
     pagina = request.args.get("pagina", 1, type=int)
     por_pagina = request.args.get("por_pagina", 20, type=int)
     estado = request.args.get("estado")
-    prioridad = request.args.get("prioridad")
     area = request.args.get("area")
 
     query = Ticket.query
 
     if g.usuario.rol != "admin":
-        query = query.filter_by(usuario_id=g.usuario.id)
+        query = query.filter_by(area_origen=g.usuario.area)
 
     if estado:
         query = query.filter_by(estado=estado)
-    if prioridad:
-        query = query.filter_by(prioridad=prioridad)
     if area:
         query = query.filter_by(area_origen=area)
 
@@ -43,7 +40,7 @@ def listar_tickets():
 def obtener_ticket(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
 
-    if g.usuario.rol != "admin" and ticket.usuario_id != g.usuario.id:
+    if g.usuario.rol != "admin" and ticket.area_origen != g.usuario.area:
         return jsonify({"error": "No autorizado"}), 403
 
     return jsonify({
@@ -61,14 +58,19 @@ def crear_ticket():
 
     titulo = data.get("titulo", "").strip()
     descripcion = data.get("descripcion", "").strip()
-    if not titulo or not descripcion:
-        return jsonify({"error": "titulo y descripcion son requeridos"}), 400
+    solicitante_nombre = data.get("solicitante_nombre", "").strip()
+    if not titulo or not descripcion or not solicitante_nombre:
+        return jsonify({"error": "titulo, descripcion y solicitante_nombre son requeridos"}), 400
+
+    area_origen = data.get("area_origen", g.usuario.area).strip()
+    if g.usuario.rol != "admin":
+        area_origen = g.usuario.area
 
     ticket = Ticket(
         titulo=titulo,
         descripcion=descripcion,
-        area_origen=data.get("area_origen", g.usuario.area).strip(),
-        prioridad=data.get("prioridad", "media"),
+        solicitante_nombre=solicitante_nombre,
+        area_origen=area_origen,
         usuario_id=g.usuario.id,
     )
     db.session.add(ticket)
@@ -151,7 +153,7 @@ def asignar_ticket(ticket_id):
 def agregar_comentario(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
 
-    if g.usuario.rol != "admin" and ticket.usuario_id != g.usuario.id:
+    if g.usuario.rol != "admin" and ticket.area_origen != g.usuario.area:
         return jsonify({"error": "No autorizado"}), 403
 
     data = request.get_json()

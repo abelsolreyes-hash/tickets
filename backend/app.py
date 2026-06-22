@@ -31,7 +31,8 @@ def crear_admin_si_no_existe():
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    origins = os.environ.get("CORS_ORIGINS", "http://localhost:5000,http://127.0.0.1:5000").split(",")
+    CORS(app, resources={r"/api/*": {"origins": origins}})
 
     db.init_app(app)
 

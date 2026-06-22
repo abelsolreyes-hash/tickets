@@ -27,7 +27,10 @@ const App = {
     const app = document.getElementById("app");
     app.innerHTML = `
       <header class="app-header">
-        <h1>Sistema de Tickets - Informatica</h1>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <img src="img/logo.png" alt="Logo" style="height:32px">
+          <h1>Sistema de Tickets - Informatica</h1>
+        </div>
         <div class="user-info">
           <span>${Auth.usuario.nombre}</span>
           <span class="rol-badge">${Auth.usuario.rol}</span>
@@ -103,6 +106,7 @@ const App = {
                   <th>Area</th>
                   <th>Rol</th>
                   <th>Registro</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -114,6 +118,7 @@ const App = {
                     <td>${u.area}</td>
                     <td><span class="rol-badge" style="background:${u.rol === "admin" ? "var(--warning)" : "var(--primary)"}">${u.rol}</span></td>
                     <td>${new Date(u.creado_en).toLocaleDateString()}</td>
+                    <td><button class="btn btn-secondary btn-sm btn-reset-pwd" data-user-id="${u.id}" data-user-name="${u.nombre}">Resetear password</button></td>
                   </tr>
                 `).join("")}
               </tbody>
@@ -121,6 +126,20 @@ const App = {
           </div>
         </div>
       `;
+      document.querySelectorAll(".btn-reset-pwd").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const userId = parseInt(btn.dataset.userId);
+          const userName = btn.dataset.userName;
+          const newPassword = prompt(`Nueva contrasena para ${userName}:`);
+          if (!newPassword || newPassword.length < 6) {
+            alert("La contrasena debe tener al menos 6 caracteres");
+            return;
+          }
+          api.updateUser(userId, { password: newPassword })
+            .then(() => alert("Contrasena actualizada correctamente"))
+            .catch(err => alert("Error: " + err.message));
+        });
+      });
     } catch (err) {
       container.innerHTML = `<p style="color:var(--danger)">Error: ${err.message}</p>`;
     }

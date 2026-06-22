@@ -1,5 +1,6 @@
 import os
 import sys
+import secrets
 
 
 def get_data_dir():
@@ -14,7 +15,7 @@ def get_data_dir():
 
 class Config:
     DATA_DIR = get_data_dir()
-    SECRET_KEY = os.environ.get("SECRET_KEY", "cambiar-en-produccion-1234567890abc")
+    SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_urlsafe(32))
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL", f"sqlite:///{os.path.join(DATA_DIR, 'tickets.db')}"
     ).replace("postgres://", "postgresql://", 1)

@@ -37,7 +37,6 @@ def notificar_creacion_ticket(ticket, usuario, mail_config):
     <p><strong>Titulo:</strong> {ticket.titulo}</p>
     <p><strong>Descripcion:</strong> {ticket.descripcion}</p>
     <p><strong>Area Origen:</strong> {ticket.area_origen}</p>
-    <p><strong>Prioridad:</strong> {ticket.prioridad}</p>
     <p><strong>Estado:</strong> {ticket.estado}</p>
     <hr>
     <p>Tu ticket ha sido registrado. Pronto recibiras respuesta del area de Informatica.</p>

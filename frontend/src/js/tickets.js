@@ -6,9 +6,7 @@ const Tickets = {
     try {
       const params = { pagina: page, por_pagina: 20 };
       const estadoFiltro = document.getElementById("filter-estado")?.value;
-      const prioridadFiltro = document.getElementById("filter-prioridad")?.value;
       if (estadoFiltro) params.estado = estadoFiltro;
-      if (prioridadFiltro) params.prioridad = prioridadFiltro;
 
       const data = await api.listTickets(params);
       container.innerHTML = this.renderLista(data);
@@ -37,16 +35,7 @@ const Tickets = {
               <option value="cerrado">Cerrado</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Prioridad</label>
-            <select id="filter-prioridad">
-              <option value="">Todas</option>
-              <option value="baja">Baja</option>
-              <option value="media">Media</option>
-              <option value="alta">Alta</option>
-              <option value="critica">Critica</option>
-            </select>
-          </div>
+
           <button class="btn btn-secondary btn-sm" id="btn-filtrar" style="margin-bottom:1px">Filtrar</button>
         </div>
         <div class="table-container">
@@ -55,8 +44,8 @@ const Tickets = {
               <tr>
                 <th>ID</th>
                 <th>Titulo</th>
+                <th>Solicitante</th>
                 <th>Area</th>
-                <th>Prioridad</th>
                 <th>Estado</th>
                 <th>Asignado</th>
                 <th>Creado</th>
@@ -69,8 +58,8 @@ const Tickets = {
                 <tr>
                   <td>#${t.id}</td>
                   <td>${t.titulo}</td>
+                  <td>${t.solicitante_nombre}</td>
                   <td>${t.area_origen}</td>
-                  <td><span class="badge badge-${t.prioridad}">${t.prioridad}</span></td>
                   <td><span class="badge badge-${t.estado}">${t.estado.replace("_", " ")}</span></td>
                   <td>${t.asignado_nombre || "-"}</td>
                   <td>${new Date(t.creado_en).toLocaleDateString()}</td>
@@ -110,8 +99,18 @@ const Tickets = {
     });
   },
 
-  mostrarFormulario() {
+  async mostrarFormulario() {
     const container = document.getElementById("page-content");
+
+    let areasHtml = "";
+    if (Auth.isAdmin()) {
+      try {
+        const usersData = await api.listUsers();
+        const areas = [...new Set((usersData.usuarios || []).map(u => u.area).filter(Boolean))];
+        areasHtml = areas.map(a => `<option value="${a}">${a}</option>`).join("");
+      } catch (_) {}
+    }
+
     container.innerHTML = `
       <div class="card" style="max-width:600px">
         <div class="card-header">
@@ -125,22 +124,22 @@ const Tickets = {
               <input type="text" id="ticket-titulo" required placeholder="Resumen del problema">
             </div>
             <div class="form-group">
-              <label>Descripcion *</label>
-              <textarea id="ticket-descripcion" required placeholder="Describe el problema en detalle..."></textarea>
+              <label>Nombre del solicitante *</label>
+              <input type="text" id="ticket-solicitante" required placeholder="Nombre de la persona que solicita">
             </div>
+            <div class="form-group">
+              <label>Descripcion del problema *</label>
+              <textarea id="ticket-descripcion" required placeholder="Describe el problema en detalle..."></textarea>
+              <small style="color:var(--gray-500);display:block;margin-top:0.25rem">Describe el problema detalladamente. Incluye la informacion necesaria para su resolucion.</small>
+            </div>
+            ${Auth.isAdmin() ? `
             <div class="form-group">
               <label>Area de origen</label>
-              <input type="text" id="ticket-area" value="${Auth.usuario.area}">
-            </div>
-            <div class="form-group">
-              <label>Prioridad</label>
-              <select id="ticket-prioridad">
-                <option value="baja">Baja</option>
-                <option value="media" selected>Media</option>
-                <option value="alta">Alta</option>
-                <option value="critica">Critica</option>
+              <select id="ticket-area">
+                ${areasHtml}
               </select>
             </div>
+            ` : ""}
             <div class="form-actions">
               <button type="submit" class="btn btn-primary">Crear Ticket</button>
               <button type="button" class="btn btn-secondary" id="btn-cancelar-form">Cancelar</button>
@@ -155,9 +154,12 @@ const Tickets = {
       const data = {
         titulo: document.getElementById("ticket-titulo").value,
         descripcion: document.getElementById("ticket-descripcion").value,
-        area_origen: document.getElementById("ticket-area").value,
-        prioridad: document.getElementById("ticket-prioridad").value,
+        solicitante_nombre: document.getElementById("ticket-solicitante").value,
       };
+      if (Auth.isAdmin()) {
+        const areaEl = document.getElementById("ticket-area");
+        if (areaEl) data.area_origen = areaEl.value;
+      }
       try {
         await api.createTicket(data);
         App.navegar("tickets");
@@ -187,13 +189,16 @@ const Tickets = {
               <h3>Ticket #${t.id} - ${t.titulo}</h3>
               <div class="flex gap-2 items-center">
                 <span class="badge badge-${t.estado}">${t.estado.replace("_", " ")}</span>
-                <span class="badge badge-${t.prioridad}">${t.prioridad}</span>
               </div>
             </div>
             <div class="card-body">
               <div class="field">
                 <div class="field-label">Descripcion</div>
                 <div class="field-value">${t.descripcion}</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Solicitante</div>
+                <div class="field-value">${t.solicitante_nombre}</div>
               </div>
               <div class="field">
                 <div class="field-label">Area Origen</div>

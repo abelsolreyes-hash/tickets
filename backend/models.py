@@ -13,7 +13,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     rol = db.Column(db.String(20), nullable=False, default="user")  # user | admin
-    area = db.Column(db.String(100), nullable=False, default="General")
+    area = db.Column(db.String(100), unique=True, nullable=False, default="General")
     creado_en = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     tickets = db.relationship("Ticket", backref="usuario", lazy=True, foreign_keys="Ticket.usuario_id")
@@ -44,9 +44,7 @@ class Ticket(db.Model):
     estado = db.Column(
         db.String(20), nullable=False, default="abierto"
     )  # abierto | en_progreso | resuelto | cerrado
-    prioridad = db.Column(
-        db.String(20), nullable=False, default="media"
-    )  # baja | media | alta | critica
+    solicitante_nombre = db.Column(db.String(200), nullable=False)
     area_origen = db.Column(db.String(100), nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     asignado_a = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
@@ -69,7 +67,7 @@ class Ticket(db.Model):
             "titulo": self.titulo,
             "descripcion": self.descripcion,
             "estado": self.estado,
-            "prioridad": self.prioridad,
+            "solicitante_nombre": self.solicitante_nombre,
             "area_origen": self.area_origen,
             "usuario_id": self.usuario_id,
             "usuario_nombre": self.usuario.nombre if self.usuario else None,
