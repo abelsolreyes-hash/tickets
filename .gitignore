@@ -10,3 +10,5 @@ flask_out.txt
 build/
 *.spec
 .DS_Store
+.env
+pgdata/

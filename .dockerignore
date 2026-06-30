@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.db
+dist/
+dist-electron*/
+build/
+node_modules/
+flask_*.txt
+.git/
+.gitignore
+.env
+.env.example
+*.spec
+.DS_Store
