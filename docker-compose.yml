@@ -6,7 +6,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://tickets:${DB_PASSWORD}@db:5432/tickets
       - SECRET_KEY=${SECRET_KEY}
-      - CORS_ORIGINS=https://${DOMAIN}
+      - CORS_ORIGINS=*
       - MAIL_SERVER=${MAIL_SERVER}
       - MAIL_USERNAME=${MAIL_USERNAME}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
@@ -30,15 +30,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-    depends_on:
-      - backend
     restart: unless-stopped
 
 volumes:
