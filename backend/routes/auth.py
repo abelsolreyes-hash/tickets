@@ -19,8 +19,6 @@ def register():
         return jsonify({"error": "El email ya esta registrado"}), 409
 
     area = data.get("area", "General").strip()
-    if User.query.filter_by(area=area).first():
-        return jsonify({"error": "Ya existe un usuario registrado en esta area"}), 409
 
     usuario = User(
         nombre=data["nombre"].strip(),
